@@ -257,15 +257,16 @@ where
     }
 }
 
-impl<'a, CtxFactory, Query, Mutation, CtxT, S>
+impl<'a, CtxFactory, Query, Mutation, CtxT, S, Tinfo>
     GraphQLHandler<'a, CtxFactory, Query, Mutation, CtxT, S>
 where
+    Tinfo: Default + Sync + Send + 'static,
     S: ScalarValue + 'a,
     for<'b> &'b S: ScalarRefValue<'b>,
     CtxFactory: Fn(&mut Request) -> IronResult<CtxT> + Send + Sync + 'static,
     CtxT: 'static,
-    Query: GraphQLType<S, Context = CtxT, TypeInfo = ()> + Send + Sync + 'static,
-    Mutation: GraphQLType<S, Context = CtxT, TypeInfo = ()> + Send + Sync + 'static,
+    Query: GraphQLType<S, Context = CtxT, TypeInfo = Tinfo> + Send + Sync + 'static,
+    Mutation: GraphQLType<S, Context = CtxT, TypeInfo = Tinfo> + Send + Sync + 'static,
 {
     /// Build a new GraphQL handler
     ///
@@ -344,15 +345,16 @@ impl PlaygroundHandler {
     }
 }
 
-impl<'a, CtxFactory, Query, Mutation, CtxT, S> Handler
+impl<'a, CtxFactory, Query, Mutation, CtxT, S, Tinfo> Handler
     for GraphQLHandler<'a, CtxFactory, Query, Mutation, CtxT, S>
 where
+    Tinfo: Default + Sync + Send + 'static,
     S: ScalarValue + Sync + Send + 'static,
     for<'b> &'b S: ScalarRefValue<'b>,
     CtxFactory: Fn(&mut Request) -> IronResult<CtxT> + Send + Sync + 'static,
     CtxT: 'static,
-    Query: GraphQLType<S, Context = CtxT, TypeInfo = ()> + Send + Sync + 'static,
-    Mutation: GraphQLType<S, Context = CtxT, TypeInfo = ()> + Send + Sync + 'static,
+    Query: GraphQLType<S, Context = CtxT, TypeInfo = Tinfo> + Send + Sync + 'static,
+    Mutation: GraphQLType<S, Context = CtxT, TypeInfo = Tinfo> + Send + Sync + 'static,
     'a: 'static,
 {
     fn handle(&self, mut req: &mut Request) -> IronResult<Response> {

@@ -71,11 +71,12 @@ pub enum DirectiveLocation {
     InlineFragment,
 }
 
-impl<'a, QueryT, MutationT, S> RootNode<'a, QueryT, MutationT, S>
+impl<'a, QueryT, MutationT, S, Tinfo> RootNode<'a, QueryT, MutationT, S>
 where
+    Tinfo: Default,
     S: ScalarValue + 'a,
-    QueryT: GraphQLType<S, TypeInfo = ()>,
-    MutationT: GraphQLType<S, TypeInfo = ()>,
+    QueryT: GraphQLType<S, TypeInfo = Tinfo>,
+    MutationT: GraphQLType<S, TypeInfo = Tinfo>,
     for<'b> &'b S: ScalarRefValue<'b>,
 {
     /// Construct a new root node from query and mutation nodes
@@ -86,7 +87,7 @@ where
     where
         for<'b> &'b S: ScalarRefValue<'b>,
     {
-        RootNode::new_with_info(query_obj, mutation_obj, (), ())
+        RootNode::new_with_info(query_obj, mutation_obj, Tinfo::default(), Tinfo::default())
     }
 }
 
